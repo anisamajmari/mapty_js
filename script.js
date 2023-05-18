@@ -17,6 +17,8 @@ class Workout {
 }
 
 class Cycling extends Workout {
+  type = "cycling";
+
   constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
     this.elevationGain = elevationGain;
@@ -24,6 +26,8 @@ class Cycling extends Workout {
 }
 
 class Running extends Workout {
+  type = "running";
+
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
     this.cadence = cadence;
@@ -34,8 +38,13 @@ class App {
   #map;
   #zoomLevel = 12;
   #mapEvent;
+  #workouts = [];
+
   constructor() {
     this._getLocation();
+
+    //Event handler
+    form.addEventListener("submit", this._newWorkout.bind(this));
   }
 
   _getLocation() {
@@ -67,6 +76,46 @@ class App {
     this.#mapEvent = mapEvent;
     form.classList.remove("hidden");
     inputDistance.focus();
+  }
+
+  _newWorkout(e) {
+    const validInputs = (...inputs) =>
+      inputs.every((inp) => Number.isFinite(inp));
+    const allPositive = (...inputs) => inputs.every((input) => input > 0);
+
+    e.preventDefault();
+
+    const type = inputType.value;
+    const distance = inputDistance.value;
+    const duration = inputDuration.value;
+    const { lat, lng } = this.#mapEvent.latlng;
+    let workout;
+
+    if (type === "running") {
+      const cadence = +inputCadence.value;
+      if (
+        validInputs(distance, duration, cadence) ||
+        !allPositive(distance, duration, cadence)
+      ) {
+        return alert("Inputs have to be positive numbers!");
+      }
+      workout = new Running([lat, lng], distance, duration, cadence);
+    }
+
+    if (type === "cycling") {
+      const elevation = +inputElevation.value;
+
+      if (
+        !allPositive(distance, duration) ||
+        !validInputs(distance, duration, elevation)
+      ) {
+        return alert("Inputs have to be positive numbers!");
+      }
+      workout = new Cycling([lat, lng], distance, duration);
+    }
+
+    this.#workouts.push(workout);
+    console.log(this.#workouts);
   }
 }
 
