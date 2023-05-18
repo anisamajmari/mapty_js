@@ -1,5 +1,13 @@
 "use strict";
 
+const containerWorkout = document.querySelector(".workouts");
+const inputDistance = document.querySelector(".form__input--distance");
+const inputDuration = document.querySelector(".form__input--duration");
+const inputType = document.querySelector(".form__input--type");
+const inputCadence = document.querySelector(".form__input--cadence");
+const inputElevation = document.querySelector(".form__input--elevation");
+const form = document.querySelector(".form");
+
 class Workout {
   constructor(coords, distance, duration) {
     this.coords = coords;
@@ -25,6 +33,7 @@ class Running extends Workout {
 class App {
   #map;
   #zoomLevel = 12;
+  #mapEvent;
   constructor() {
     this._getLocation();
   }
@@ -50,6 +59,14 @@ class App {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
+
+    this.#map.on("click", this._showForm.bind(this));
+  }
+
+  _showForm(mapEvent) {
+    this.#mapEvent = mapEvent;
+    form.classList.remove("hidden");
+    inputDistance.focus();
   }
 }
 
