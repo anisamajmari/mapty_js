@@ -44,6 +44,7 @@ class App {
     this._getLocation();
 
     //Event handler
+    inputType.addEventListener("change", this._toggleEvelationField);
     form.addEventListener("submit", this._newWorkout.bind(this));
   }
 
@@ -70,12 +71,22 @@ class App {
     }).addTo(this.#map);
 
     this.#map.on("click", this._showForm.bind(this));
+
+    //Render workout marker
+    this.#workouts.forEach((workout) => {
+      this._renderWorkoutMarker(workout);
+    });
   }
 
   _showForm(mapEvent) {
     this.#mapEvent = mapEvent;
     form.classList.remove("hidden");
     inputDistance.focus();
+  }
+
+  _toggleEvelationField() {
+    inputElevation.closest(".form__row").classList.toggle("form__row--hidden");
+    inputCadence.closest(".form__row").classList.toggle("form__row--hidden");
   }
 
   _newWorkout(e) {
@@ -107,7 +118,7 @@ class App {
 
       if (
         !allPositive(distance, duration) ||
-        !validInputs(distance, duration, elevation)
+        validInputs(distance, duration, elevation)
       ) {
         return alert("Inputs have to be positive numbers!");
       }
@@ -116,6 +127,24 @@ class App {
 
     this.#workouts.push(workout);
     console.log(this.#workouts);
+
+    this._renderWorkoutMarker(workout);
+  }
+
+  _renderWorkoutMarker(workout) {
+    L.marker(workout.coords)
+      .addTo(this.#map)
+      .bindPopup(
+        L.popup({
+          maxWidth: 250,
+          minWidth: 100,
+          autoClose: false,
+          closeOnClick: false,
+          className: `${workout.type}-popup`,
+        })
+      )
+      .setPopupContent(`${workout.type === "running" ? "🏃‍♀️" : "🚴"} workout`)
+      .openPopup();
   }
 }
 
