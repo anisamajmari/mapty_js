@@ -22,6 +22,13 @@ class Cycling extends Workout {
   constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
     this.elevationGain = elevationGain;
+    this.calculateSpeed();
+  }
+
+  calculateSpeed() {
+    this.speed = this.distance / (this.duration / 60);
+    console.log(this.speed);
+    return this.speed;
   }
 }
 
@@ -31,6 +38,13 @@ class Running extends Workout {
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
     this.cadence = cadence;
+    this.calculatePace();
+  }
+
+  calculatePace() {
+    this.pace = this.duration / this.distance;
+    console.log(this.pace);
+    return this.pace;
   }
 }
 
