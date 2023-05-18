@@ -10,6 +10,8 @@ const form = document.querySelector(".form");
 
 class Workout {
   date = new Date();
+  id = (Date.now() + "").slice(-10);
+
   constructor(coords, distance, duration) {
     this.coords = coords;
     this.distance = distance;
@@ -72,6 +74,10 @@ class App {
     //Event handler
     inputType.addEventListener("change", this._toggleEvelationField);
     form.addEventListener("submit", this._newWorkout.bind(this));
+    containerWorkout.addEventListener(
+      "click",
+      this._moveToWorkoutMarker.bind(this)
+    );
   }
 
   _getLocation() {
@@ -189,7 +195,7 @@ class App {
 
   _renderWorkoutList(workout) {
     let html = `
-    <li class="workout workout--${workout.type}" data-id="1234567890">
+    <li class="workout workout--${workout.type}" data-id="${workout.id}">
         <h2 class="workout__title">${workout.description}</h2>
         <div class="workout__details">
             <span class="workout__icon">🏃‍♂️</span>
@@ -236,6 +242,25 @@ class App {
     }
 
     form.insertAdjacentHTML("afterend", html);
+  }
+
+  _moveToWorkoutMarker(e) {
+    if (!this.#map) return;
+
+    const workoutEl = e.target.closest(".workout");
+
+    if (!workoutEl) return;
+
+    const workoutt = this.#workouts.find(
+      (work) => work.id === workoutEl.dataset.id
+    );
+
+    this.#map.setView(workoutt.coords, this.#zoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
   }
 }
 
